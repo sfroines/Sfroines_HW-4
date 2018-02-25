@@ -1,30 +1,99 @@
 ---
-title: 'HW #4'
+title: "HW3 R and Rmarkdown"
 author: "Sam Froines"
-date: "2/25/2018"
-output: word_document
+date: "2/19/2018"
+output:
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+# Introduction
 
-```{r cars}
-summary(cars)
+  I am using the NEON source to compare the different amount of Biomass recorded in multiple locations in the United States. I will be comparing locations with the site ID of (BART, GUAN, HARV, SRER, STEI,TREE,UNDE). These NEON research stations record environmental data and allow the public to freely use and download it. They record different types of litter fall. I have chosen to compare the amount of "woody material" between each of the locations listed above. Because  each of the environments and climates of each site are different, I predict that the box plot will show a large numerical difference between them.
+
+
+# Methods
+
+  The data I am using is directly from NEON's website http://www.neonscience.org/. This website has free environmental  data for anyone, and can be easily downloaded. The data I am using is from a file in ltr_massdata. From this file I am using the subset of the functional group called "woody materials" . I will make a box plot comparing the amount of biomass of "woody materials" for each NEON site.   Then I will run a ANOVA test to test if the amount of biomass at each locations are statistically significant. I can then visually and statistically analyze the differences and similarities from location to location. 
+
+
+
+
+# Results
+
+```{r read-subset-data}
+litter_data <- read.csv("data/ltr_massdata_copy.csv",
+                        header = TRUE)
+```
+```{r woody-material-subset}
+#Woody material and Twigs/branches
+allsites_Woody_material_data <- subset(litter_data,
+                       functionalgroup = "Woody material")
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
+```{r Boxplot of woody materials by location}
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+
+boxplot(dryMass ~ siteID,
+        data = allsites_Woody_material_data, 
+        main = "Mass of litterfall by woody materials",
+        xlab = "NEON Location by siteID",
+        ylab = "Dry mass of Woody materials in grams")
+
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r scatterplot of SRER and GUAN}
+
+
+boxplot(dryMass ~ siteID,
+        data = allsites_Woody_material_data, 
+        main = "Mass of litterfall by woody materials",
+        xlab = "NEON Location by siteID",
+        ylab = "Dry mass of Woody materials in grams")
+
+
+```
+
+
+Chi-Square test
+I used a x^2 test to see if there was a significant trend of woody material biomass between these different locations. First I set my null and alternative hypothesizes, than I conducted the test below using ANOVA
+
+**Null hypothesis:**there is no difference between the amount of woody material biomass at each of the locations
+
+**Alternative hypothesis:** there is a difference in the amount of woody material biomass at each location
+
+
+```{r statistical-test}
+
+anova(lm(dryMass ~ functionalGroup,
+         data = allsites_Woody_material_data))
+
+summary(anova(lm(dryMass ~ functionalGroup,
+         data = allsites_Woody_material_data)))
+```
+
+**Chi-square test conclusion:**
+  In this test we got a F value(Value for testing the null hypothesis that the group means for that effect are equal) of 156.49. Pr(>F) is the significance probability value associated with the F Value. The value from our test was 2.2x10^-16 at the alpha level of 0.0 with a degrees of freedom of 7. This test shows that that there is a very small probability that the Null hypothesis is true, and gives evidence to reject it. This test gives evidence that the alternative hypothesis is true. The F-Test showed statistically that the differences in means of biomass at each location are definitely not equal to zero. 
+
+
+
+
+
+
+
+# Discussion
+
+  The reason why this conclusion makes sense is because the locations were so diverse and had vastly different climates, environments, and types of vegetation. There are so many possible reasons why the amount of biomass of woody material at these locations could have been of different amounts. 
+
+  After researching the specific Locations (BART, GUAN, HARV, SRER, STEI,TREE,UNDE) I saw that BART, STEI,TREE, and UNDE are all located near northern Wisconsin. I thought that these locations would be much more similar in the amount of biomass, but because there are locations like GUAN site in Puerto Rico and SRER site in Arizona it wouldn't make sense that they were all equal. Even the sites HARV and BART in the northeastern region of the U.S. have different amounts of biomass between them. I think that the biomass of woody materials is vastly different for each location. Even when the NEON sites were relatively close to each other, they still had a significantly difference in means of biomass.
+
+
+
+
